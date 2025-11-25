@@ -149,4 +149,4 @@ export const ResultCard: FC<ResultCardProps> = ({ result }) => {
       </div>
     </div>
   );
-};+
+};

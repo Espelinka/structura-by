@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 
-// Fix for TS2591: Cannot find name 'process'
+// Ensure process.env is available globally
 declare var process: {
   env: {
     API_KEY: string;
