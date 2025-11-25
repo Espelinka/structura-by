@@ -11,7 +11,6 @@ interface ImageUploadProps {
 export const ImageUpload: FC<ImageUploadProps> = ({ images, onImagesChange, disabled }) => {
   const handleFileSelect = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      // Cast to File[] to ensure TS treats the result of Array.from as an array of Files
       const newFiles = Array.from(e.target.files) as File[];
       const newImageFiles: ImageFile[] = newFiles.map(file => ({
         file,
@@ -49,9 +48,9 @@ export const ImageUpload: FC<ImageUploadProps> = ({ images, onImagesChange, disa
           <div className="h-12 w-12 bg-engineering-100 text-engineering-600 rounded-full flex items-center justify-center mb-4">
             <Upload className="h-6 w-6" />
           </div>
-          <h3 className="text-lg font-semibold text-slate-900">Upload Inspection Photos</h3>
-          <p className="text-slate-500 mt-2 text-sm">Drag and drop or click to select</p>
-          <p className="text-slate-400 mt-1 text-xs">Supports JPG, PNG, WEBP</p>
+          <h3 className="text-lg font-semibold text-slate-900">Загрузите фото дефектов</h3>
+          <p className="text-slate-500 mt-2 text-sm">Перетащите или нажмите для выбора</p>
+          <p className="text-slate-400 mt-1 text-xs">Поддерживаются JPG, PNG, WEBP</p>
         </label>
       </div>
 
@@ -61,7 +60,7 @@ export const ImageUpload: FC<ImageUploadProps> = ({ images, onImagesChange, disa
             <div key={idx} className="relative group aspect-square bg-slate-100 rounded-lg overflow-hidden border border-slate-200 shadow-sm">
               <img
                 src={img.preview}
-                alt={`Upload ${idx + 1}`}
+                alt={`Загрузка ${idx + 1}`}
                 className="w-full h-full object-cover"
               />
               {!disabled && (

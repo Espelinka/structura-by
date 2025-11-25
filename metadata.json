@@ -1,6 +1,6 @@
 {
-  "name": "Structura.BY - Expert Defect Analysis",
-  "description": "A specialized engineering application for analyzing building construction defects according to Belarus regulations СН 1.04.01-2020 and СП 1.04.02-2022 using Gemini AI.",
+  "name": "Structura.BY - Техническая Экспертиза",
+  "description": "Специализированное инженерное приложение для анализа дефектов строительных конструкций в соответствии с нормативами Республики Беларусь СН 1.04.01-2020 и СП 1.04.02-2022 с использованием Gemini AI.",
   "requestFramePermissions": [
     "camera"
   ]

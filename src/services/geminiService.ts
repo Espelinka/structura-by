@@ -2,55 +2,46 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { AnalysisResult } from "../types";
 
 const SYSTEM_INSTRUCTION = `
-You are a specialized Senior Structural Engineer acting as a Technical Expert for building analysis in the Republic of Belarus.
-Your task is to analyze images of building structures and identify defects strictly according to two specific normative documents:
-1. СН 1.04.01-2020 "Техническое состояние зданий и сооружений" (Technical condition of buildings and structures)
-2. СП 1.04.02-2022 "Общие положения по обследованию строительных конструкций зданий и сооружений" (General provisions for the inspection of building structures)
+Ты — специализированная инженерная модель, выполняющая техническую экспертизу строительных конструкций на основе изображений.
+Твоя задача — проанализировать фото и составить строгий инженерный отчет, используя ИСКЛЮЧИТЕЛЬНО следующие нормативные документы Республики Беларусь:
+1. СН 1.04.01-2020 "Техническое состояние зданий и сооружений"
+2. СП 1.04.02-2022 "Общие положения по обследованию строительных конструкций зданий и сооружений"
 
-MANDATORY RULES:
-1. Use ONLY the provided norms. Do not use external internet data or general construction knowledge if it contradicts these docs.
-2. Analyze all images as a single set. Provide one consolidated conclusion for the primary element shown.
-3. Defect Codes: Determine codes ONLY from Appendix A (Приложение А) of СП 1.04.02-2022. Format: "СП 1.04.02-2022, Приложение А, п. A.X".
-4. Technical Condition Category (KTS): Determine KTS (I, II, III, IV, V) using criteria from СН 1.04.01-2020. Cite the specific clause (e.g., "СН 1.04.01-2020, п. 12.4.6").
-   - I: Good (Исправное)
-   - II: Satisfactory (Работоспособное)
-   - III: Limited Workable (Ограниченно работоспособное)
-   - IV: Unsatisfactory/Pre-emergency (Неработоспособное)
-   - V: Emergency (Предельное)
-5. Structure your response strictly as a JSON object.
-6. Language: Russian (as the norms are in Russian).
-7. If data is insufficient, state "Недостаточно данных" but provide the most probable estimation based on visible signs.
+ОБЯЗАТЕЛЬНЫЕ ПРАВИЛА РАБОТЫ:
+1. Используй ТОЛЬКО указанные нормативы. Запрещено использовать внешние знания или интернет-данные, если они не подтверждены этими документами.
+2. Анализируй все переданные фото как единый набор. Давай одно итоговое заключение по одному основному элементу.
+3. Коды дефектов: Определять ТОЛЬКО по Приложению А СП 1.04.02-2022. Формат: "СП 1.04.02-2022, Приложение А, п. A.X".
+4. Категория технического состояния (КТС): Определять по СН 1.04.01-2020 (I, II, III, IV, V). Обязательно указывать пункт нормы (например, "СН 1.04.01-2020, п. 12.4.6").
+5. Структура ответа должна СТРОГО соответствовать JSON схеме ниже.
+6. Язык: Русский.
+7. Если фото недостаточно информативно, укажи "Недостаточно данных для однозначной классификации", но дай наиболее вероятную оценку.
 
-OUTPUT JSON STRUCTURE:
-{
-  "defect": "Short name of defect",
-  "code": "Code from Appx A of СП",
-  "description": "Technical description based on visual evidence",
-  "normativeReference": "Exact clause from norms",
-  "kts": "Category (I-V)",
-  "measures": "Required actions per norms (e.g., urgent propping, repair)",
-  "priority": "Urgency (Immediate/Planned)",
-  "repairMethods": "Technical method for elimination",
-  "confidence": "Number 0-100",
-  "reasoning": "Brief logic for the decision"
-}
+СТРУКТУРА ОТЧЕТА (поля JSON):
+1. defect: Название дефекта.
+2. code: Код дефекта (по Приложению А СП 1.04.02-2022).
+3. description: Краткое описание дефекта (что именно видно на фото).
+4. normativeReference: Точное соответствие нормативным документам (цитаты пунктов из СП и СН, подтверждающие дефект).
+5. kts: Категория технического состояния (КТС) с обоснованием по СН 1.04.01-2020.
+6. measures: Рекомендуемые мероприятия (ИСКЛЮЧИТЕЛЬНО по нормативам).
+7. priority: Приоритет/срочность устранения (на основе СП и СН).
+8. repairMethods: Методы/способы устранения выявленных дефектов (допускается экспертное мнение, не противоречащее нормам).
+9. confidence: Оценка уверенности (число 0-100).
 `;
 
 const RESPONSE_SCHEMA = {
   type: Type.OBJECT,
   properties: {
-    defect: { type: Type.STRING, description: "Name of the defect" },
-    code: { type: Type.STRING, description: "Code from Appendix A of СП 1.04.02-2022" },
-    description: { type: Type.STRING, description: "Visual description" },
-    normativeReference: { type: Type.STRING, description: "Reference to clauses in СН or СП" },
-    kts: { type: Type.STRING, description: "Technical Condition Category (I-V)" },
-    measures: { type: Type.STRING, description: "Recommended measures per norms" },
-    priority: { type: Type.STRING, description: "Urgency of repair" },
-    repairMethods: { type: Type.STRING, description: "Suggested repair methods" },
-    confidence: { type: Type.NUMBER, description: "Confidence score 0-100" },
-    reasoning: { type: Type.STRING, description: "Explanation of the classification" },
+    defect: { type: Type.STRING, description: "1. Название дефекта" },
+    code: { type: Type.STRING, description: "1. Код дефекта (например: СП 1.04.02-2022, Приложение А, п. А.2.1)" },
+    description: { type: Type.STRING, description: "2. Краткое описание наблюдаемого дефекта" },
+    normativeReference: { type: Type.STRING, description: "3. Нормативное обоснование (цитаты и пункты из СП и СН)" },
+    kts: { type: Type.STRING, description: "4. Категория технического состояния (I-V) с обоснованием" },
+    measures: { type: Type.STRING, description: "5. Рекомендуемые мероприятия по нормативам" },
+    priority: { type: Type.STRING, description: "6. Приоритет/срочность" },
+    repairMethods: { type: Type.STRING, description: "7. Методы устранения (экспертная часть)" },
+    confidence: { type: Type.NUMBER, description: "8. Оценка уверенности (0-100)" },
   },
-  required: ["defect", "code", "description", "normativeReference", "kts", "measures", "priority", "repairMethods", "confidence", "reasoning"]
+  required: ["defect", "code", "description", "normativeReference", "kts", "measures", "priority", "repairMethods", "confidence"]
 };
 
 export const analyzeImages = async (
@@ -73,11 +64,11 @@ export const analyzeImages = async (
   );
 
   const promptText = `
-    Analyze the attached images of building structures.
-    User Comments: ${userComments || "None"}
+    Проанализируй приложенные изображения строительных конструкций.
+    Комментарий пользователя: ${userComments || "Нет"}
     
-    Perform a technical expertise based strictly on СН 1.04.01-2020 and СП 1.04.02-2022.
-    Identify the defect, assign the code from Appendix A of СП, determine the KTS based on СН, and recommend measures.
+    Выполни техническую экспертизу строго в соответствии с СН 1.04.01-2020 и СП 1.04.02-2022.
+    Заполни все поля отчета согласно инструкции.
   `;
 
   try {
@@ -90,7 +81,7 @@ export const analyzeImages = async (
         systemInstruction: SYSTEM_INSTRUCTION,
         responseMimeType: "application/json",
         responseSchema: RESPONSE_SCHEMA,
-        temperature: 0.2, // Low temperature for more deterministic/technical results
+        temperature: 0.1, // Low temperature for strict adherence to norms
       },
     });
 

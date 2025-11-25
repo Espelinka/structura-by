@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { FileText, ShieldAlert, Wrench, Book, Activity } from 'lucide-react';
+import { FileText, ShieldAlert, Wrench, Book, Activity, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { AnalysisResult, KTS } from '../types';
 import clsx from 'clsx';
 
@@ -9,27 +9,30 @@ interface ResultCardProps {
 
 export const ResultCard: FC<ResultCardProps> = ({ result }) => {
   const getKtsColor = (kts: string) => {
-    switch (kts.toUpperCase()) {
-      case KTS.I: return 'bg-emerald-100 text-emerald-800 border-emerald-200';
-      case KTS.II: return 'bg-blue-100 text-blue-800 border-blue-200';
-      case KTS.III: return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case KTS.IV: return 'bg-orange-100 text-orange-800 border-orange-200';
-      case KTS.V: return 'bg-red-100 text-red-800 border-red-200';
-      default: return 'bg-slate-100 text-slate-800 border-slate-200';
-    }
+    const ktsUpper = kts.toUpperCase();
+    if (ktsUpper.includes('I') && !ktsUpper.includes('III') && !ktsUpper.includes('V')) return 'bg-emerald-100 text-emerald-800 border-emerald-200';
+    if (ktsUpper.includes('II')) return 'bg-blue-100 text-blue-800 border-blue-200';
+    if (ktsUpper.includes('III')) return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+    if (ktsUpper.includes('IV')) return 'bg-orange-100 text-orange-800 border-orange-200';
+    if (ktsUpper.includes('V')) return 'bg-red-100 text-red-800 border-red-200';
+    return 'bg-slate-100 text-slate-800 border-slate-200';
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden" id="analysis-report">
-      <div className="bg-slate-50 px-6 py-4 border-b border-slate-200 flex justify-between items-center">
-        <h2 className="text-lg font-bold text-slate-900 flex items-center">
-          <Activity className="h-5 w-5 mr-2 text-engineering-600" />
-          Technical Expertise Result
-        </h2>
-        <div className="flex items-center space-x-2">
-          <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">Confidence</span>
+    <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden print:shadow-none" id="analysis-report">
+      {/* Report Header */}
+      <div className="bg-slate-50 px-8 py-6 border-b border-slate-200 flex justify-between items-center">
+        <div>
+          <h2 className="text-2xl font-bold text-slate-900 flex items-center">
+            <Activity className="h-6 w-6 mr-3 text-engineering-600" />
+            Техническое Заключение
+          </h2>
+          <p className="text-sm text-slate-500 mt-1">На основании СН 1.04.01-2020 и СП 1.04.02-2022</p>
+        </div>
+        <div className="flex flex-col items-end">
+          <span className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">Достоверность</span>
           <div className={clsx(
-            "px-2.5 py-0.5 rounded-full text-sm font-bold border",
+            "px-3 py-1 rounded-full text-sm font-bold border",
             result.confidence > 80 ? "bg-green-50 text-green-700 border-green-200" : "bg-yellow-50 text-yellow-700 border-yellow-200"
           )}>
             {result.confidence}%
@@ -37,92 +40,111 @@ export const ResultCard: FC<ResultCardProps> = ({ result }) => {
         </div>
       </div>
 
-      <div className="p-6 space-y-6">
-        {/* Main Defect Header */}
-        <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-100">
-          <div>
-            <div className="text-sm text-slate-500 mb-1">Identified Defect</div>
-            <div className="text-xl font-bold text-slate-900">{result.defect}</div>
-            <div className="text-sm font-mono text-slate-500 mt-1 flex items-center">
-              <Book className="h-3 w-3 mr-1" />
+      <div className="p-8 space-y-8">
+        
+        {/* 1. Код дефекта */}
+        <section>
+          <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-3 border-b pb-2 flex items-center">
+            <span className="bg-slate-200 text-slate-700 rounded-full w-6 h-6 flex items-center justify-center text-xs mr-2">1</span>
+            Определённый дефект и код
+          </h3>
+          <div className="bg-slate-50 p-5 rounded-lg border border-slate-200">
+            <div className="text-lg font-semibold text-slate-900 mb-2">{result.defect}</div>
+            <div className="font-mono text-sm text-engineering-700 bg-engineering-50 inline-block px-3 py-1 rounded border border-engineering-100">
               {result.code}
             </div>
           </div>
-          <div className={clsx("px-4 py-3 rounded-lg border flex flex-col items-center min-w-[120px]", getKtsColor(result.kts))}>
-            <span className="text-xs font-semibold opacity-70 mb-1">KTS Category</span>
-            <span className="text-2xl font-black tracking-tight">{result.kts}</span>
+        </section>
+
+        {/* 2. Краткое описание */}
+        <section>
+          <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-3 border-b pb-2 flex items-center">
+            <span className="bg-slate-200 text-slate-700 rounded-full w-6 h-6 flex items-center justify-center text-xs mr-2">2</span>
+            Краткое описание дефекта
+          </h3>
+          <p className="text-slate-700 text-base leading-relaxed whitespace-pre-line">
+            {result.description}
+          </p>
+        </section>
+
+        {/* 3. Нормативное обоснование */}
+        <section>
+          <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-3 border-b pb-2 flex items-center">
+            <span className="bg-slate-200 text-slate-700 rounded-full w-6 h-6 flex items-center justify-center text-xs mr-2">3</span>
+            Нормативное обоснование
+          </h3>
+          <div className="bg-slate-50 p-5 rounded-lg border-l-4 border-slate-400 italic text-slate-700 text-sm">
+            {result.normativeReference}
           </div>
+        </section>
+
+        {/* 4. Категория технического состояния (КТС) */}
+        <section>
+          <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-3 border-b pb-2 flex items-center">
+            <span className="bg-slate-200 text-slate-700 rounded-full w-6 h-6 flex items-center justify-center text-xs mr-2">4</span>
+            Категория технического состояния (КТС)
+          </h3>
+          <div className={clsx("p-6 rounded-lg border-2", getKtsColor(result.kts))}>
+            <div className="flex items-start">
+              <AlertTriangle className="h-6 w-6 mr-4 mt-1 flex-shrink-0" />
+              <div>
+                <h4 className="text-xl font-bold mb-2">{result.kts.split('\n')[0]}</h4>
+                <p className="text-sm opacity-90 whitespace-pre-line">{result.kts.split('\n').slice(1).join('\n')}</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* 5. Рекомендуемые мероприятия */}
+          <section>
+            <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-3 border-b pb-2 flex items-center">
+              <span className="bg-slate-200 text-slate-700 rounded-full w-6 h-6 flex items-center justify-center text-xs mr-2">5</span>
+              Рекомендуемые мероприятия
+            </h3>
+            <div className="bg-blue-50 p-5 rounded-lg border border-blue-100 text-slate-800 text-sm leading-relaxed whitespace-pre-line">
+              {result.measures}
+            </div>
+          </section>
+
+          {/* 6. Приоритет */}
+          <section>
+            <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-3 border-b pb-2 flex items-center">
+              <span className="bg-slate-200 text-slate-700 rounded-full w-6 h-6 flex items-center justify-center text-xs mr-2">6</span>
+              Приоритет / Срочность
+            </h3>
+            <div className="bg-white p-5 rounded-lg border border-slate-200 flex items-center">
+              <ShieldAlert className={clsx(
+                "h-8 w-8 mr-4",
+                result.priority.toLowerCase().includes('высокая') || result.priority.toLowerCase().includes('аварий') 
+                  ? "text-red-500" 
+                  : "text-blue-500"
+              )} />
+              <div className="text-lg font-medium text-slate-900">
+                {result.priority}
+              </div>
+            </div>
+          </section>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Left Column */}
-          <div className="space-y-6">
-            <div>
-              <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider mb-3 flex items-center">
-                <FileText className="h-4 w-4 mr-2 text-slate-400" />
-                Description & Reasoning
-              </h3>
-              <div className="bg-white p-4 rounded-lg border border-slate-200 space-y-4">
-                <p className="text-slate-700 text-sm leading-relaxed">{result.description}</p>
-                <div className="pt-4 border-t border-slate-100">
-                  <span className="text-xs font-semibold text-slate-500 block mb-2">EXPERT REASONING</span>
-                  <p className="text-slate-600 text-sm italic bg-slate-50 p-3 rounded border border-slate-100">
-                    "{result.reasoning}"
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider mb-3 flex items-center">
-                <Book className="h-4 w-4 mr-2 text-slate-400" />
-                Normative Reference
-              </h3>
-              <div className="bg-slate-900 text-slate-50 p-4 rounded-lg font-mono text-sm shadow-sm">
-                {result.normativeReference}
-              </div>
+        {/* 7. Методы устранения */}
+        <section>
+          <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-3 border-b pb-2 flex items-center">
+            <span className="bg-slate-200 text-slate-700 rounded-full w-6 h-6 flex items-center justify-center text-xs mr-2">7</span>
+            Методы устранения дефектов
+          </h3>
+          <div className="bg-white p-6 rounded-lg border border-slate-200 shadow-sm">
+            <div className="flex items-start">
+              <Wrench className="h-5 w-5 mr-3 text-slate-400 mt-0.5" />
+              <p className="text-slate-700 text-sm leading-relaxed whitespace-pre-line">
+                {result.repairMethods}
+              </p>
             </div>
           </div>
+        </section>
 
-          {/* Right Column */}
-          <div className="space-y-6">
-            <div>
-              <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider mb-3 flex items-center">
-                <ShieldAlert className="h-4 w-4 mr-2 text-slate-400" />
-                Measures & Priority
-              </h3>
-              <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
-                <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
-                  <span className="text-sm font-medium text-slate-700">Required Action</span>
-                  <span className={clsx(
-                    "px-2 py-0.5 rounded text-xs font-bold uppercase",
-                    result.priority.toLowerCase().includes('immediate') || result.priority.toLowerCase().includes('urgent') 
-                      ? "bg-red-100 text-red-700" 
-                      : "bg-blue-100 text-blue-700"
-                  )}>
-                    {result.priority}
-                  </span>
-                </div>
-                <div className="p-4">
-                  <p className="text-slate-700 text-sm">{result.measures}</p>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider mb-3 flex items-center">
-                <Wrench className="h-4 w-4 mr-2 text-slate-400" />
-                Repair Methods
-              </h3>
-              <div className="bg-engineering-50 p-4 rounded-lg border border-engineering-100">
-                <p className="text-slate-800 text-sm leading-relaxed whitespace-pre-line">{result.repairMethods}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div className="mt-6 pt-4 border-t border-slate-100 text-center">
-           <p className="text-xs text-slate-400">Analysis generated based on СН 1.04.01-2020 and СП 1.04.02-2022. Verification by a licensed engineer is recommended.</p>
+        <div className="pt-6 border-t border-slate-100 text-center text-xs text-slate-400">
+          <p>Автоматически сгенерированный отчет. Требует верификации аттестованным специалистом.</p>
         </div>
       </div>
     </div>
