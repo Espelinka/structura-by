@@ -1,13 +1,28 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+/// <reference types="vite/client" />
 
-// https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [react()],
-  define: {
-    // Stringify the API key to ensure it's embedded as a string literal in the build
-    'process.env.API_KEY': JSON.stringify(process.env.API_KEY),
-    // Prevent "process is not defined" errors in browser if other libs access it
-    'process.env': {}
+declare const process: {
+  env: {
+    API_KEY: string;
+    [key: string]: string | undefined;
   }
-})
+};
+
+declare module 'html2pdf.js' {
+  interface Html2PdfOptions {
+    margin?: number | [number, number, number, number];
+    filename?: string;
+    image?: { type: string; quality: number };
+    html2canvas?: any;
+    jsPDF?: any;
+  }
+
+  interface Html2PdfWorker {
+    from(element: HTMLElement): Html2PdfWorker;
+    set(options: Html2PdfOptions): Html2PdfWorker;
+    save(): void;
+    then(callback: () => void): void;
+  }
+
+  function html2pdf(): Html2PdfWorker;
+  export default html2pdf;
+}
