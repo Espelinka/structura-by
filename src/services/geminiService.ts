@@ -57,14 +57,7 @@ export const analyzeImages = async (
   images: File[], 
   userComments?: string
 ): Promise<AnalysisResult> => {
-  // Access specific env var defined in vite.config.ts
-  const apiKey = process.env.API_KEY;
-  
-  if (!apiKey) {
-    throw new Error("API Key is missing. Please configure process.env.API_KEY.");
-  }
-
-  const ai = new GoogleGenAI({ apiKey });
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
   // Convert images to base64
   const imageParts = await Promise.all(
