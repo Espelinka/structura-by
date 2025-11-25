@@ -1,6 +1,6 @@
 import { FC } from 'react';
-import { FileText, ShieldAlert, Wrench, Book, Activity, AlertTriangle, CheckCircle2 } from 'lucide-react';
-import { AnalysisResult, KTS } from '../types';
+import { ShieldAlert, Wrench, Activity, AlertTriangle } from 'lucide-react';
+import { AnalysisResult } from '../types';
 import clsx from 'clsx';
 
 interface ResultCardProps {
@@ -149,4 +149,4 @@ export const ResultCard: FC<ResultCardProps> = ({ result }) => {
       </div>
     </div>
   );
-};
+};+
