@@ -1,21 +1,20 @@
 /// <reference types="vite/client" />
 
-// Fix for TS2591: Explicitly declare process as a global variable for browser environment
-declare var process: {
-  env: {
+declare namespace NodeJS {
+  interface ProcessEnv {
     API_KEY: string;
     [key: string]: string | undefined;
   }
-};
+}
 
 declare module 'html2pdf.js' {
   interface Html2PdfOptions {
-    // Changed from tuple to number[] | number to accept standard arrays and avoid TS2345
-    margin?: number | number[]; 
+    margin?: number | number[];
     filename?: string;
     image?: { type: string; quality: number };
     html2canvas?: any;
     jsPDF?: any;
+    pagebreak?: { mode: string | string[] };
   }
 
   interface Html2PdfWorker {
@@ -25,6 +24,6 @@ declare module 'html2pdf.js' {
     then(callback: () => void): void;
   }
 
-  function html2pdf(): Html2PdfWorker;
+  const html2pdf: () => Html2PdfWorker;
   export default html2pdf;
 }

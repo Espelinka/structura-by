@@ -46,7 +46,7 @@ function App() {
     if (!element) return;
 
     const opt = {
-      margin: [10, 10, 10, 10], // Correct type now supported by declaration file
+      margin: [10, 10, 10, 10] as [number, number, number, number],
       filename: `structura_by_report_${new Date().toISOString().split('T')[0]}.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { scale: 2, useCORS: true, letterRendering: true },
