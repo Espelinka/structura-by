@@ -1,5 +1,6 @@
+/// <reference types="vite/client" />
+
 // Fix for TS2591: Explicitly declare process as a global variable for browser environment
-// This ensures the compiler knows about process.env.API_KEY injected by Vite
 declare var process: {
   env: {
     API_KEY: string;
@@ -9,7 +10,8 @@ declare var process: {
 
 declare module 'html2pdf.js' {
   interface Html2PdfOptions {
-    margin?: number | [number, number, number, number];
+    // Changed from tuple to number[] | number to accept standard arrays and avoid TS2345
+    margin?: number | number[]; 
     filename?: string;
     image?: { type: string; quality: number };
     html2canvas?: any;
