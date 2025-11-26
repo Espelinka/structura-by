@@ -1,3 +1,12 @@
+// Fix for TS2591: Explicitly declare process as a global variable for browser environment
+// This ensures the compiler knows about process.env.API_KEY injected by Vite
+declare var process: {
+  env: {
+    API_KEY: string;
+    [key: string]: string | undefined;
+  }
+};
+
 declare module 'html2pdf.js' {
   interface Html2PdfOptions {
     margin?: number | [number, number, number, number];
