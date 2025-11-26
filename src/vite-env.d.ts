@@ -1,14 +1,14 @@
 // Исправление ошибки: удалена ссылка на отсутствующий vite/client
 // /// <reference types="vite/client" />
 
-// Исправление ошибки TS2591: Расширяем интерфейс ProcessEnv вместо переопределения переменной process,
-// чтобы избежать конфликта "Cannot redeclare block-scoped variable 'process'".
-declare namespace NodeJS {
-  interface ProcessEnv {
+// Исправление ошибки TS2591: Явно объявляем глобальную переменную process для среды браузера.
+// Используем 'var' вместо 'const', чтобы избежать конфликтов переобъявления.
+declare var process: {
+  env: {
     API_KEY: string;
     [key: string]: string | undefined;
   }
-}
+};
 
 declare module 'html2pdf.js' {
   interface Html2PdfOptions {
