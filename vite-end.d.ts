@@ -1,1 +1,1 @@
-// This file is deprecated and should be removed. Using src/vite-env.d.ts instead.
+// This file is deprecated and should be ignored.
